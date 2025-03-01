@@ -86,8 +86,7 @@ fn serialize_numeric(T: type, numeric_ptr: *const T, target_buffer: []u8) void {
 
     // if one byte, no need for endian correction
     if (@sizeOf(T) == 1) {
-        //target_buffer[0] = std.mem.toBytes(numeric_ptr.*)[0];
-        target_buffer[0] = @bitCast(numeric_ptr.*);
+        target_buffer[0] = std.mem.toBytes(numeric_ptr.*)[0];
         return;
     }
 
@@ -112,7 +111,7 @@ fn deserialize_numeric(TargetType: type, data: []const u8, target_field_ptr: *Ta
 
     // if the target type is of size 1 byte, no need for endian correction
     if (@sizeOf(TargetType) == 1) {
-        target_field_ptr.* = @intCast(std.mem.bytesAsValue(TargetType, &data[0]).*);
+        target_field_ptr.* = std.mem.bytesAsValue(TargetType, &data[0]).*;
         return;
     }
 
@@ -317,6 +316,7 @@ const TestStruct = struct {
     unsinged: u16,
     signed: i32,
     flag: bool,
+    small: i2,
 };
 
 test "size" {
@@ -331,6 +331,7 @@ test "test serializer" {
         .flag = true,
         .signed = -50,
         .unsinged = 100,
+        .small = 1,
     };
 
     var byte_array: [get_serialization_array_size(TestStruct)]u8 = undefined;
@@ -348,6 +349,7 @@ test "test serializer" {
             try std.testing.expect(deserialized.flag);
             try std.testing.expect(deserialized.signed == -50);
             try std.testing.expect(deserialized.unsinged == 100);
+            try std.testing.expect(deserialized.small == 1);
         },
         else => unreachable,
     }
@@ -361,6 +363,7 @@ test "alloc serializer" {
         .flag = true,
         .signed = -50,
         .unsinged = 100,
+        .small = -1,
     };
 
     const allocator = std.testing.allocator;
@@ -378,6 +381,7 @@ test "alloc serializer" {
     try std.testing.expect(deserialized_ptr.flag);
     try std.testing.expect(deserialized_ptr.signed == -50);
     try std.testing.expect(deserialized_ptr.unsinged == 100);
+    try std.testing.expect(deserialized_ptr.small == -1);
 }
 
 const TestStructWithPointer = struct {
