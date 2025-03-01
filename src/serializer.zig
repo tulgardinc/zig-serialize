@@ -229,7 +229,7 @@ fn deserialize_data(TargetType: type, target_ptr: *TargetType, source_slice: []c
     }
 }
 
-fn GenSerializer(comptime types: []const type) type {
+pub fn GenSerializer(comptime types: []const type) type {
     return struct {
         /// Returns the maximum size that can be serialized of the registed types
         fn get_max_serialization_size() comptime_int {
