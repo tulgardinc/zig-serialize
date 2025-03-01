@@ -280,7 +280,7 @@ pub fn GenSerializer(comptime types: []const type) type {
         /// Deserializes the byte slice into a given target.
         pub fn deserialize(TargetStructType: type, target_struct_ptr: *TargetStructType, source_slice: []const u8) void {
             if (@typeInfo(TargetStructType) != .@"struct") @compileError("Argument should be a pointer to a struct type");
-            std.debug.assert(get_serialization_array_size(TargetStructType) == source_slice.len);
+            std.debug.assert(get_serialization_array_size(TargetStructType) <= source_slice.len);
 
             deserialize_data(TargetStructType, target_struct_ptr, source_slice[1..], 0, null) catch unreachable;
         }
@@ -290,7 +290,7 @@ pub fn GenSerializer(comptime types: []const type) type {
         /// Allocates the struct on the heap and returns a pointer to it.
         pub fn deserialize_with_allocator(TargetStructType: type, data: []const u8, allocator: std.mem.Allocator) !*TargetStructType {
             if (@typeInfo(TargetStructType) != .@"struct") @compileError("Argument should be a pointer to a struct type");
-            std.debug.assert(get_serialization_array_size(TargetStructType) == data.len);
+            std.debug.assert(get_serialization_array_size(TargetStructType) <= data.len);
 
             const target_struct_ptr = try allocator.create(TargetStructType);
 
