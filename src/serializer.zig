@@ -253,9 +253,11 @@ pub fn GenSerializer(comptime types: []const type) type {
         /// Entry point for recursive serialization.
         pub fn serialize(
             SourceType: type,
-            target_slice: *[get_serialization_array_size(SourceType)]u8,
+            target_slice: []u8,
             source_object_ptr: *const SourceType,
         ) void {
+            std.debug.assert(target_slice.len >= get_serialization_array_size(SourceType));
+
             target_slice[0] = get_index(SourceType);
             serialize_data(SourceType, target_slice[1..], 0, source_object_ptr);
         }
