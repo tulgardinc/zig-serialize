@@ -232,7 +232,7 @@ fn deserialize_data(TargetType: type, target_ptr: *TargetType, source_slice: []c
 pub fn GenSerializer(comptime types: []const type) type {
     return struct {
         /// Returns the maximum size that can be serialized of the registed types
-        fn get_max_serialization_size() comptime_int {
+        pub fn get_max_serialization_size() comptime_int {
             var max: comptime_int = 0;
             inline for (types) |T| {
                 max = @max(max, get_serialization_size(T));
@@ -241,7 +241,7 @@ pub fn GenSerializer(comptime types: []const type) type {
         }
 
         /// Gets index of registered type
-        fn get_index(T: type) u8 {
+        pub fn get_index(T: type) u8 {
             inline for (types, 0..) |t, index| {
                 if (t == T) {
                     return index;
@@ -251,7 +251,7 @@ pub fn GenSerializer(comptime types: []const type) type {
         }
 
         /// Entry point for recursive serialization.
-        fn serialize(
+        pub fn serialize(
             SourceType: type,
             target_slice: *[get_serialization_array_size(SourceType)]u8,
             source_object_ptr: *const SourceType,
@@ -262,7 +262,7 @@ pub fn GenSerializer(comptime types: []const type) type {
 
         /// Entry point for recursive serialization.
         /// Allocates a buffer on the heap and returns it as a slice.
-        fn serialize_with_allocator(
+        pub fn serialize_with_allocator(
             SourceType: type,
             source_object_ptr: *const SourceType,
             allocator: std.mem.Allocator,
@@ -277,7 +277,7 @@ pub fn GenSerializer(comptime types: []const type) type {
 
         /// Entry point for recursive deserialization.
         /// Deserializes the byte slice into a given target.
-        fn deserialize(TargetStructType: type, target_struct_ptr: *TargetStructType, source_slice: []const u8) void {
+        pub fn deserialize(TargetStructType: type, target_struct_ptr: *TargetStructType, source_slice: []const u8) void {
             if (@typeInfo(TargetStructType) != .@"struct") @compileError("Argument should be a pointer to a struct type");
             std.debug.assert(get_serialization_array_size(TargetStructType) == source_slice.len);
 
@@ -287,7 +287,7 @@ pub fn GenSerializer(comptime types: []const type) type {
         /// Entry point for recursive deserialization.
         /// Deserializes the byte slice into a given target.
         /// Allocates the struct on the heap and returns a pointer to it.
-        fn deserialize_with_allocator(TargetStructType: type, data: []const u8, allocator: std.mem.Allocator) !*TargetStructType {
+        pub fn deserialize_with_allocator(TargetStructType: type, data: []const u8, allocator: std.mem.Allocator) !*TargetStructType {
             if (@typeInfo(TargetStructType) != .@"struct") @compileError("Argument should be a pointer to a struct type");
             std.debug.assert(get_serialization_array_size(TargetStructType) == data.len);
 
@@ -299,7 +299,7 @@ pub fn GenSerializer(comptime types: []const type) type {
         }
 
         /// Utility function to get the index form the first byte
-        fn get_index_from_byte_array(array: []const u8) u8 {
+        pub fn get_index_from_byte_array(array: []const u8) u8 {
             return array[0];
         }
     };
